@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>trAIde - AI-Powered Trading Analysis</title>
+    <style>
+        :root {
+            --primary-color: #3a86ff;
+            --secondary-color: #8338ec;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --chat-user-bg: #e6f2ff;
+            --chat-ai-bg: #f0f0f0;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #5d8bf4;
+            --secondary-color: #9d4edd;
+            --background-color: #121212;
+            --card-background: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #333333;
+            --chat-user-bg: #2a2d3e;
+            --chat-ai-bg: #1e1e1e;
+        }
+
+        [data-theme="green"] {
+            --primary-color: #2ecc71;
+            --secondary-color: #3498db;
+            --background-color: #f0f5f0;
+            --text-color: #333333;
+            --border-color: #d0e0d0;
+            --chat-user-bg: #e0f2e0;
+            --chat-ai-bg: #f0f5f0;
+        }
+
+        [data-theme="pink"] {
+            --primary-color: #ff69b4;
+            --secondary-color: #ff8da1;
+            --background-color: #fff0f5;
+            --text-color: #333333;
+            --border-color: #ffd0e0;
+            --chat-user-bg: #ffe0f0;
+            --chat-ai-bg: #fff0f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .theme-selector {
+            display: flex;
+            margin-top: 15px;
+            gap: 10px;
+        }
+
+        .theme-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            transition: transform 0.2s ease;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-btn.active {
+            transform: scale(1.2);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-btn.blue {
+            background-color: #3a86ff;
+        }
+
+        .theme-btn.dark {
+            background-color: #121212;
+        }
+
+        .theme-btn.green {
+            background-color: #2ecc71;
+        }
+
+        .theme-btn.pink {
+            background-color: #ff69b4;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .section-title {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .refresh-info {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .input-container:hover {
+            border-color: var(--primary-color);
+        }
+
+        .file-input {
+            padding: 12px;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 15px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+        }
+
+        .preview-container {
+            margin-top: 20px;
+            width: 100%;
+            display: none;
+            text-align: center;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .button {
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .loading-text {
+            margin-left: 10px;
+            font-weight: 500;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .results-container {
+            display: none;
+        }
+
+        .analysis-content {
+            background-color: var(--background-color);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 15px;
+            white-space: pre-line;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            padding: 10px;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Main layout grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Chat Container Styles */
+        .chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            min-height: 250px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: var(--card-background);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px 5px 0 0;
+        }
+
+        .chat-message {
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+            word-wrap: break-word;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--chat-user-bg);
+            border-bottom-right-radius: 0;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background-color: var(--chat-ai-bg);
+            border-bottom-left-radius: 0;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 10px;
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: var(--card-background);
+            color: var(--text-color);
+        }
+
+        .chat-send-btn {
+            padding: 0 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .suggested-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .question-pill {
+            padding: 8px 16px;
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .question-pill:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* News Section Styles */
+        .news-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        .news-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .news-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .news-source {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+        }
+
+        .news-date {
+            font-size: 0.8rem;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .news-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            display: block;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+
+        .news-link:hover {
+            text-decoration: underline;
+        }
+
+        .news-loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">trAIde</h1>
+            <p class="subtitle">AI-Powered Trading Chart Analysis</p>
+            
+            <div class="theme-selector">
+                <div class="theme-btn blue active" data-theme="default" title="Blue Theme"></div>
+                <div class="theme-btn dark" data-theme="dark" title="Dark Theme"></div>
+                <div class="theme-btn green" data-theme="green" title="Green Theme"></div>
+                <div class="theme-btn pink" data-theme="pink" title="Pink Theme"></div>
+            </div>
+        </header>
+
+        <!-- Main content - Chart and Chat side by side -->
+        <div class="main-grid">
+            <!-- Chart Analysis Section -->
+            <section class="card">
+                <h2 class="section-title">Upload Trading Chart</h2>
+                <div class="input-container">
+                    <input type="file" id="imageFile" class="file-input" accept="image/*">
+                    <div class="preview-container" id="previewContainer">
+                        <img id="imagePreview" src="#" alt="Chart Preview">
+                    </div>
+                    
+                    <button id="analyzeBtn" class="button" disabled>Analyze Chart</button>
+                    
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <span class="loading-text">Analyzing chart...</span>
+                    </div>
+                    
+                    <div class="error-message" id="errorMessage"></div>
+                </div>
+                
+                <div class="results-container" id="resultsContainer">
+                    <h3 class="section-title">Technical Analysis Results</h3>
+                    <div class="analysis-content" id="analysisResults"></div>
+                </div>
+            </section>
+
+            <!-- Chat Section -->
+            <section class="card">
+                <h2 class="section-title">Ask AI About Your Chart</h2>
+                <div class="suggested-questions">
+                    <div class="question-pill">Where are key support/resistance levels?</div>
+                    <div class="question-pill">What patterns are forming and their implications?</div>
+                    <div class="question-pill">Does volume confirm price movement?</div>
+                    <div class="question-pill">Any indicator divergences signaling reversals?</div>
+                </div>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message ai-message">
+                            Hello! I'm your AI trading assistant. Upload a chart and ask me specific questions about it.
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about your chart...">
+                        <button class="chat-send-btn" id="sendMessageBtn">Send</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- News Section - Full width below -->
+        <section class="card">
+            <h2 class="section-title">
+                Market News
+                <span class="refresh-info" id="refreshInfo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                        <path d="M21 3v5h-5"></path>
+                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                        <path d="M3 21v-5h5"></path>
+                    </svg>
+                    Updates in <span id="refreshCounter">60</span>s
+                </span>
+            </h2>
+            <div class="news-container" id="newsContainer">
+                <div class="news-loading">Loading market news...</div>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2025 trAIde - AI-Powered Trading Analysis | <a href="https://traide.io" style="color: var(--primary-color);">traide.io</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // API Constants
+        const NEWS_API_ENDPOINT = "https://stocknewsapi.com/api/v1/category?section=general&items=3&page=1&token=r0bxfw20grmoxkgeeqtef9dyzdxsjwizzak08msf";
+        const CLAUDE_API_ENDPOINT = 'http://localhost:3000/proxy';
+        const CLAUDE_MODEL = 'claude-3-7-sonnet-20250219';
+        const NEWS_REFRESH_INTERVAL = 60; // in seconds
+        
+        // DOM elements
+        const imageFileInput = document.getElementById('imageFile');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loading = document.getElementById('loading');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const analysisResults = document.getElementById('analysisResults');
+        const errorMessage = document.getElementById('errorMessage');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        const questionPills = document.querySelectorAll('.question-pill');
+        const newsContainer = document.getElementById('newsContainer');
+        const refreshCounter = document.getElementById('refreshCounter');
+        
+        // Store the current chart image for chat context
+        let currentChartBase64 = null;
+        let currentChartType = null;
+        let newsRefreshTimer;
+        let refreshCountdown = NEWS_REFRESH_INTERVAL;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved theme
+            const savedTheme = localStorage.getItem('traide-theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+                themeButtons.forEach(btn => {
+                    if (btn.getAttribute('data-theme') === savedTheme) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Load market news and start auto-refresh
+            fetchMarketNews();
+            startNewsRefreshTimer();
+            
+            // Handle file input change
+            imageFileInput.addEventListener('change', handleImageLoad);
+        });
+
+        // Theme management
+        themeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const theme = this.getAttribute('data-theme');
+                setTheme(theme);
+                
+                // Update active button
+                themeButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        function setTheme(theme) {
+            if (theme === 'default') {
+                document.body.removeAttribute('data-theme');
+            } else {
+                document.body.setAttribute('data-theme', theme);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('traide-theme', theme);
+        }
+
+        /**
+         * Start news refresh timer
+         */
+        function startNewsRefreshTimer() {
+            refreshCountdown = NEWS_REFRESH_INTERVAL;
+            refreshCounter.textContent = refreshCountdown;
+            
+            if (newsRefreshTimer) {
+                clearInterval(newsRefreshTimer);
+            }
+            
+            newsRefreshTimer = setInterval(() => {
+                refreshCountdown--;
+                refreshCounter.textContent = refreshCountdown;
+                
+                if (refreshCountdown <= 0) {
+                    fetchMarketNews();
+                    refreshCountdown = NEWS_REFRESH_INTERVAL;
+                    refreshCounter.textContent = refreshCountdown;
+                }
+            }, 1000);
+        }
+
+        /**
+         * Fetch market news from StockNewsAPI
+         */
+        function fetchMarketNews() {
+            fetch(NEWS_API_ENDPOINT)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch news: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayNews(data);
+                })
+                .catch(error => {
+                    console.error("News API Error:", error);
+                    newsContainer.innerHTML = `
+                        <div class="error-message" style="display: block;">
+                            Failed to load market news. Please try again later.
+                        </div>
+                    `;
+                });
+        }
+
+        /**
+         * Display news data in the UI
+         */
+        function displayNews(data) {
+            if (!data.data || data.data.length === 0) {
+                newsContainer.innerHTML = '<p>No market news available at this time.</p>';
+                return;
+            }
+
+            let newsHTML = '';
+            
+            data.data.forEach(article => {
+                const date = new Date(article.date);
+                const formattedDate = date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+                
+                newsHTML += `
+                    <div class="news-item">
+                        <div class="news-title">${article.title}</div>
+                        <div class="news-source">${article.source_name}</div>
+                        <div class="news-date">${formattedDate}</div>
+                        <a href="${article.news_url}" target="_blank" class="news-link">Read more</a>
+                    </div>
+                `;
+            });
+            
+            newsContainer.innerHTML = newsHTML;
+        }
+
+        /**
+         * Handle image file selection
+         */
+        function handleImageLoad() {
+            const file = imageFileInput.files[0];
+            
+            // Reset UI
+            errorMessage.style.display = 'none';
+            resultsContainer.style.display = 'none';
+            analysisResults.textContent = '';
+            
+            if (!file) {
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                showError("Please select a valid image file.");
+                return;
+            }
+
+            // Show loading indicator for image load
+            analyzeBtn.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                previewContainer.style.display = 'block';
+                analyzeBtn.disabled = false;
+                
+                // Store base64 data without the prefix
+                currentChartBase64 = e.target.result.split(',')[1];
+                currentChartType = file.type;
+                
+                // Add AI message about new chart
+                addMessage("I see you've uploaded a new chart. Click 'Analyze Chart' for a full analysis or ask me specific questions about it.", "ai");
+            };
+            reader.onerror = function() {
+                showError("Failed to load image. Please try again.");
+                previewContainer.style.display = 'none';
+                analyzeBtn.disabled = true;
+                currentChartBase64 = null;
+                currentChartType = null;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        /**
+         * Handle analyze button click event
+         */
+        analyzeBtn.addEventListener('click', function() {
+            if (!currentChartBase64) {
+                showError("Please upload an image first.");
+                return;
+            }
+
+            // Show loading indicator
+            loading.style.display = 'flex';
+            analyzeBtn.disabled = true;
+            errorMessage.style.display = 'none';
+
+            // Send to proxy
+            sendToAnthropicAPI(
+                currentChartBase64, 
+                currentChartType, 
+                "Roleplay as an experienced trader. Identify patterns, support/resistance levels, and chart patterns. Consider volume and technical indicators. Recommend next steps with % probability estimates. Keep response concise."
+            )
+            .then(result => {
+                displayResults(result);
+                addMessage("I've completed my analysis of your chart. You can see the full results above, or ask me specific questions about the chart.", "ai");
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showError(error.message || "Failed to analyze the chart. Please check your connection and try again.");
+            })
+            .finally(() => {
+                loading.style.display = 'none';
+                analyzeBtn.disabled = false;
+            });
+        });
+
+        /**
+         * Send image to proxy for analysis using Claude
+         */
+        function sendToAnthropicAPI(base64Image, mediaType, prompt) {
+            const payload = {
+                model: CLAUDE_MODEL,
+                max_tokens: 1000,
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            {
+                                type: "text",
+                                text: prompt
+                            },
+                            {
+                                type: "image",
+                                source: {
+                                    type: "base64",
+                                    media_type: mediaType,
+                                    data: base64Image
+                                }
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            return fetch(CLAUDE_API_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        try {
+                            const errorData = JSON.parse(text);
+                            throw new Error(`Proxy error: ${errorData.error?.message || response.statusText}`);
+                        } catch (e) {
+                            throw new Error(`Proxy error: ${response.status} ${response.statusText}`);
+                        }
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.content && data.content.length > 0) {
+                    const textContent = data.content.find(item => item.type === 'text');
+                    if (textContent && textContent.text) {
+                        return textContent.text;
+                    }
+                }
+                throw new Error('Unexpected proxy response format');
+            });
+        }
+
+        /**
+         * Display analysis results in the UI
+         */
+        function displayResults(result) {
+            analysisResults.textContent = result;
+            resultsContainer.style.display = 'block';
+        }
+
+        /**
+         * Show error message to the user
+         */
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        /**
+         * Add a message to the chat
+         */
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+            messageDiv.textContent = text;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        /**
+         * Send a chat message
+         */
+        function sendChatMessage() {
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            
+            // Clear input
+            chatInput.value = '';
+            
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.classList.add('chat-message', 'ai-message');
+            typingIndicator.textContent = 'Thinking...';
+            typingIndicator.id = 'typingIndicator';
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            if (!currentChartBase64) {
+                // No chart uploaded yet
+                setTimeout(() => {
+                    chatMessages.removeChild(document.getElementById('typingIndicator'));
+                    addMessage("Please upload a chart first so I can analyze it and answer your questions.", "ai");
+                }, 1000);
+                return;
+            }
+            
+            // Send to API with the current chart
+            sendToAnthropicAPI(
+                currentChartBase64, 
+                currentChartType, 
+                `The user has uploaded a trading chart and is asking: "${message}". Provide concise expert analysis addressing their question.`
+            )
+            .then(response => {
+                // Remove typing indicator
+                chatMessages.removeChild(document.getElementById('typingIndicator'));
+                
+                // Add AI response
+                addMessage(response, "ai");
+            })
+            .catch(error => {
+                console.error("Chat error:", error);
+                
+                // Remove typing indicator
+                if (document.getElementById('typingIndicator')) {
+                    chatMessages.removeChild(document.getElementById('typingIndicator'));
+                }
+                
+                // Add error message
+                addMessage("Sorry, I encountered an error while processing your question. Please try again.", "ai");
+            });
+        }
+
+        // Chat event listeners
+        sendMessageBtn.addEventListener('click', sendChatMessage);
+        
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+        
+        // Question pills
+        questionPills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                const question = this.textContent;
+                chatInput.value = question;
+                sendChatMessage();
+            });
+        });
+        
+// Add this function to parse markdown-style formatting
+function parseMarkdown(text) {
+    // Bold: **text** -> <strong>text</strong>
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Italic: *text* -> <em>text</em> (avoid matching ** patterns)
+    text = text.replace(/\*([^*].*?)\*/g, '<em>$1</em>');
+    
+    // Code blocks: ```code``` -> <pre><code>code</code></pre>
+    text = text.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    
+    // Inline code: `code` -> <code>code</code>
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Lists: - item -> <li>item</li>, wrap in <ul> later
+    let hasUnorderedList = text.match(/^- (.*?)$/gm);
+    if (hasUnorderedList) {
+        text = text.replace(/^- (.*?)$/gm, '<li>$1</li>');
+        text = text.replace(/<li>.*?<\/li>(?:\s*<li>.*?<\/li>)*/g, function(match) {
+            return '<ul>' + match + '</ul>';
+        });
+    }
+    
+    // Headers: # Header -> <h3>Header</h3>
+    text = text.replace(/^# (.*?)$/gm, '<h3>$1</h3>');
+    
+    // Subheaders: ## Header -> <h4>Header</h4>
+    text = text.replace(/^## (.*?)$/gm, '<h4>$1</h4>');
+    
+    // Line breaks: maintain double newlines as paragraph breaks
+    text = text.replace(/\n\n/g, '</p><p>');
+    
+    // Create paragraphs if they don't exist
+    if (!text.includes('<p>') && !text.startsWith('<h') && !text.startsWith('<ul>')) {
+        text = '<p>' + text + '</p>';
+    }
+    
+    return text;
+}
+
+// Modified addMessage function
+function addMessage(text, sender) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('chat-message');
+    messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+    
+    // Parse markdown for AI messages only
+    if (sender === 'ai') {
+        messageDiv.innerHTML = parseMarkdown(text);
+    } else {
+        messageDiv.textContent = text;
+    }
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Add these styles to the existing <style> section
+const additionalStyles = `
+    /* Formatted chat message styles */
+    .ai-message p {
+        margin-bottom: 10px;
+    }
+    
+    .ai-message p:last-child {
+        margin-bottom: 0;
+    }
+    
+    .ai-message h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--primary-color);
+    }
+    
+    .ai-message h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    
+    .ai-message ul {
+        padding-left: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .ai-message li {
+        margin-bottom: 4px;
+    }
+    
+    .ai-message code {
+        font-family: monospace;
+        background-color: rgba(0, 0, 0, 0.05);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-size: 0.9em;
+    }
+    
+    .ai-message pre {
+        background-color: rgba(0, 0, 0, 0.05);
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+        margin: 10px 0;
+    }
+    
+    .ai-message pre code {
+        background-color: transparent;
+        padding: 0;
+        display: block;
+    }
+    
+    /* Adjust chat display for better readability */
+    .chat-messages {
+        padding: 15px;
+        max-height: 400px;
+    }
+    
+    .chat-message {
+        padding: 12px 15px;
+        line-height: 1.5;
+    }
+`;
+    </script>
+</body>
+</html>
